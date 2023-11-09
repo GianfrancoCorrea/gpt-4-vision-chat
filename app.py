@@ -1,11 +1,14 @@
 import chainlit as cl
 from openai import OpenAI
+from langsmith.run_helpers import traceable
+from langsmith_config import setup_langsmith_config
 import base64
 import os
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 model = "gpt-3.5-turbo-1106"
 model_vision = "gpt-4-vision-preview"
+setup_langsmith_config()
 
    
 def process_images(msg: cl.Message):
@@ -14,6 +17,10 @@ def process_images(msg: cl.Message):
 
     # Accessing the bytes of a specific image
     image_bytes = images[0].content # take the first image just for demo purposes
+    print(len(image_bytes))
+    # check the size of the image, max 1mb
+    if len(image_bytes) > 1000000:
+        return "too_large"
     
     # we need base64 encoded image
     image_base64 = base64.b64encode(image_bytes).decode('utf-8')
@@ -27,6 +34,8 @@ async def process_stream(stream, msg: cl.Message):
 def handle_vision_call(msg, image_history):
     image_base64 = None
     image_base64 = process_images(msg)
+    if image_base64 == "too_large":
+        return "too_large"
     
     if image_base64:
         # add the image to the image history
@@ -49,7 +58,7 @@ def handle_vision_call(msg, image_history):
         image_history.clear()
         return stream
 
-@traceable(run_type="llm", name="gpt 4 turbo call")
+@traceable(run_type="llm", name="gpt 3 turbo call")
 async def gpt_call(message_history: list = []):
     client = OpenAI()
 
@@ -61,7 +70,7 @@ async def gpt_call(message_history: list = []):
     
     return stream
 
-
+@traceable(run_type="llm", name="gpt 4 turbo vision call")
 def gpt_vision_call(image_history: list = []):
     client = OpenAI()
   
@@ -83,6 +92,7 @@ def start_chat():
     cl.user_session.set("image_history", [{"role": "system", "content": "You are a helpful assistant."}])
 
 @cl.on_message
+@traceable(run_type="chain", name="message")
 async def on_message(msg: cl.Message):
     message_history = cl.user_session.get("message_history")
     image_history = cl.user_session.get("image_history")
@@ -92,6 +102,9 @@ async def on_message(msg: cl.Message):
 
     if msg.elements:
         stream = handle_vision_call(msg, image_history)
+        if stream == "too_large":
+            return await cl.Message(content="Image too large, max 1mb").send()
+
 
     else:
         # add the message in both to keep the coherence between the two histories
@@ -103,5 +116,6 @@ async def on_message(msg: cl.Message):
     if stream:
         await process_stream(stream, msg=stream_msg)
         message_history.append({"role": "system", "content": stream_msg.content})
+        image_history.append({"role": "system", "content": stream_msg.content})
 
     return stream_msg.content
