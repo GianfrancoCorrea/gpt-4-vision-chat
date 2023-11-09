@@ -10,6 +10,7 @@ Drag & Drop, or click in the "UPLOAD FILES" button, on the left of the chat inpu
 If you upload more than 1 image, it will take the first image, this is just for demo purposes
 * change log:
     - Change max_tokens from the output to 300
+    - Clear images history after the response
 
 
 ## install dependencies (recomended to use a [virtualenv](https://docs.python.org/3/library/venv.html))
