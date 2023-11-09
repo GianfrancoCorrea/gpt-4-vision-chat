@@ -1,14 +1,15 @@
-# Welcome to Chainlit! 🚀🤖
+# Welcome to GPT 4 turbo vision! 🚀🤖
 
-Hi there, Developer! 👋 We're excited to have you on board. Chainlit is a powerful tool designed to help you prototype, debug and share applications built on top of LLMs.
+## Upload an image 🔗
+Drag & Drop, or click in the "UPLOAD FILES" button, on the left of the chat input 💬
 
-## Useful Links 🔗
+### GPT-4-1106-preview for messages that ARE NOT images 📝
+* change log:
+    - Changed GPT-4-1106-preview for gpt-3.5-turbo-1106, due high cost of GPT-4-1106-preview
+### gpt-4-vision-preview for messages that ARE images 📷
+If you upload more than 1 image, it will take the first image, this is just for demo purposes
+* change log:
+    - Change max_tokens from the output to 300
 
-- **Documentation:** Get started with our comprehensive [Chainlit Documentation](https://docs.chainlit.io) 📚
-- **Discord Community:** Join our friendly [Chainlit Discord](https://discord.gg/k73SQ3FyUh) to ask questions, share your projects, and connect with other developers! 💬
 
-We can't wait to see what you create with Chainlit! Happy coding! 💻😊
-
-## Welcome screen
-
-To modify the welcome screen, edit the `chainlit.md` file at the root of your project. If you do not want a welcome screen, just leave this file empty.
+For suggestions you can use the community tab or open an issue in the github repository: [gpt-4-vision-chat](https://github.com/GianfrancoCorrea/gpt-4-vision-chat)

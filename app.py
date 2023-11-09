@@ -6,7 +6,7 @@ import base64
 import os
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-model = "gpt-4-1106-preview"
+model = "gpt-3.5-turbo-1106"
 model_vision = "gpt-4-vision-preview"
 setup_langsmith_config()
     
@@ -68,7 +68,7 @@ def gpt_vision_call(image_history: list = []):
     stream = client.chat.completions.create(
         model=model_vision,
         messages=image_history,
-        max_tokens=1000,
+        max_tokens=300,
         stream=True,
     )
 
@@ -103,7 +103,6 @@ async def on_message(msg: cl.Message):
     
     if stream:
         await process_stream(stream, msg=stream_msg)
-        image_history.append({"role": "system", "content": stream_msg.content})
         message_history.append({"role": "system", "content": stream_msg.content})
 
     return stream_msg.content
