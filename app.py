@@ -83,6 +83,7 @@ def start_chat():
     cl.user_session.set("image_history", [{"role": "system", "content": "You are a helpful assistant."}])
 
 @cl.on_message
+@traceable(run_type="chain", name="gpt 4 turbo")
 async def on_message(msg: cl.Message):
     message_history = cl.user_session.get("message_history")
     image_history = cl.user_session.get("image_history")
@@ -104,3 +105,5 @@ async def on_message(msg: cl.Message):
         await process_stream(stream, msg=stream_msg)
         image_history.append({"role": "system", "content": stream_msg.content})
         message_history.append({"role": "system", "content": stream_msg.content})
+
+    return stream_msg.content
