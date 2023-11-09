@@ -1,15 +1,13 @@
 import chainlit as cl
 from openai import OpenAI
-from langsmith.run_helpers import traceable
-from langsmith_config import setup_langsmith_config
 import base64
 import os
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 model = "gpt-3.5-turbo-1106"
 model_vision = "gpt-4-vision-preview"
-setup_langsmith_config()
-    
+
+   
 def process_images(msg: cl.Message):
     # Processing images exclusively
     images = [file for file in msg.elements if "image" in file.mime]
@@ -61,7 +59,7 @@ async def gpt_call(message_history: list = []):
     
     return stream
 
-@traceable(run_type="llm", name="gpt 4 turbo vision call")
+
 def gpt_vision_call(image_history: list = []):
     client = OpenAI()
   
@@ -83,7 +81,6 @@ def start_chat():
     cl.user_session.set("image_history", [{"role": "system", "content": "You are a helpful assistant."}])
 
 @cl.on_message
-@traceable(run_type="chain", name="gpt 4 turbo")
 async def on_message(msg: cl.Message):
     message_history = cl.user_session.get("message_history")
     image_history = cl.user_session.get("image_history")
