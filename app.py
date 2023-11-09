@@ -45,6 +45,8 @@ def handle_vision_call(msg, image_history):
             }
         )
         stream = gpt_vision_call(image_history)
+        # clear the image history
+        image_history.clear()
         return stream
 
 @traceable(run_type="llm", name="gpt 4 turbo call")
