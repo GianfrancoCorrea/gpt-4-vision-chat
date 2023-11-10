@@ -11,10 +11,11 @@
 ### gpt-4-vision-preview for messages that ARE images 📷
 If you upload more than 1 image, it will take the first image, this is just for demo purposes
 * change log:
+    - Added Low res mode, to test the fidelity of responses.
     - Changed max_tokens from 300 to 100, to test the costs.
-    - Changed max_tokens from the output to 300
-    - Cleared image history after the response
-    - Image size limit set up to 1mb
+    - Changed max_tokens from the output to 300.
+    - Cleared image history after the response.
+    - Image size limit set up to 1mb.
 
 
 For suggestions you can use the community tab or open an issue in the github repository: [gpt-4-vision-chat](https://github.com/GianfrancoCorrea/gpt-4-vision-chat)
