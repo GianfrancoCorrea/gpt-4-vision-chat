@@ -4,12 +4,14 @@ from langsmith.run_helpers import traceable
 from langsmith_config import setup_langsmith_config
 import base64
 import os
+import uuid
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 model = "gpt-3.5-turbo-1106"
 model_vision = "gpt-4-vision-preview"
 setup_langsmith_config()
-
+# generate UUID for the user from python
+user_id = str(uuid.uuid4())
    
 def process_images(msg: cl.Message):
     # Processing images exclusively
@@ -58,7 +60,7 @@ def handle_vision_call(msg, image_history):
         image_history.clear()
         return stream
 
-@traceable(run_type="llm", name="gpt 3 turbo call")
+@traceable(run_type="llm", name="gpt 3 turbo call", metadata={"user": user_id})
 async def gpt_call(message_history: list = []):
     client = OpenAI()
 
@@ -66,11 +68,11 @@ async def gpt_call(message_history: list = []):
         model=model,
         messages=message_history,
         stream=True,
+        user=user_id,
     )
-    
     return stream
 
-@traceable(run_type="llm", name="gpt 4 turbo vision call")
+@traceable(run_type="llm", name="gpt 4 turbo vision call", metadata={"user": user_id})
 def gpt_vision_call(image_history: list = []):
     client = OpenAI()
   
@@ -79,6 +81,7 @@ def gpt_vision_call(image_history: list = []):
         messages=image_history,
         max_tokens=300,
         stream=True,
+        user=user_id,
     )
 
     return stream
@@ -87,12 +90,13 @@ def gpt_vision_call(image_history: list = []):
 def start_chat():
     cl.user_session.set(
         "message_history",
-        [{"role": "system", "content": "You are a helpful assistant."}],
+        [{"role": "system", "content": "You are a helpful assistant. You are made by GPT-3.5-turbo-1106, the latest version developed by Openai. You do not have the ability to receive images, but if the user uploads an image with the message, GPT-4-vision-preview will be used. So if a user asks you if you have the ability to analyze images, you can tell them that. And tell him that at the bottom left (above the text input) he has a button to upload images, or he can drag it to the chat, or he can just copy paste the input"}],
     )
-    cl.user_session.set("image_history", [{"role": "system", "content": "You are a helpful assistant."}])
+    cl.user_session.set("image_history", [{"role": "system", "content": "You are a helpful assistant. You are developed with GPT-4-vision-preview, if the user uploads an image, you have the ability to understand it. For normal messages GPT-3.5-turbo-1106 will be used, and for images you will use it. If the user asks about your capabilities you can tell them that."}])
+ 
 
 @cl.on_message
-@traceable(run_type="chain", name="message")
+@traceable(run_type="chain", name="message", metadata={"user": user_id})
 async def on_message(msg: cl.Message):
     message_history = cl.user_session.get("message_history")
     image_history = cl.user_session.get("image_history")
