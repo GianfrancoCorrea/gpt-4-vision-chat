@@ -11,6 +11,7 @@
 ### gpt-4-vision-preview for messages that ARE images 📷
 If you upload more than 1 image, it will take the first image, this is just for demo purposes
 * change log:
+    - Added Low res mode, to test the fidelity of responses
     - Changed max_tokens from 300 to 100, to test the costs.
     - Changed max_tokens from the output to 300
     - Cleared image history after the response
