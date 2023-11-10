@@ -11,14 +11,13 @@
 ### gpt-4-vision-preview for messages that ARE images 📷
 If you upload more than 1 image, it will take the first image, this is just for demo purposes
 * change log:
-    - Change max_tokens from the output to 300
-    - Clear image history after the response
-    - image size limit set to 1mb
+    - Changed max_tokens from 300 to 100, to test the costs.
+    - Changed max_tokens from the output to 300
+    - Cleared image history after the response
+    - Image size limit set up to 1mb
 
 ### ⚠ There is a limit of 100 requests per day for gpt-4-vision-preview
 If a limit reached error appears, you can wait 15 minutes and try again or in a few hours. It is an openai limit.
-
-For suggestions you can use the community tab or open an issue in the github repository: [gpt-4-vision-chat](https://github.com/GianfrancoCorrea/gpt-4-vision-chat)
 
 
 ## install dependencies (recomended to use a [virtualenv](https://docs.python.org/3/library/venv.html))
