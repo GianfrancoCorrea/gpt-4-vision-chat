@@ -1,17 +1,12 @@
 import chainlit as cl
 from openai import OpenAI
-from langsmith.run_helpers import traceable
-from langsmith_config import setup_langsmith_config
 import base64
 import os
-import uuid
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 model = "gpt-3.5-turbo-1106"
 model_vision = "gpt-4-vision-preview"
-setup_langsmith_config()
 # generate UUID for the user from python
-user_id = str(uuid.uuid4())
    
 def process_images(msg: cl.Message):
     # Processing images exclusively
@@ -61,7 +56,6 @@ def handle_vision_call(msg, image_history):
         image_history.clear()
         return stream
 
-@traceable(run_type="llm", name="gpt 3 turbo call", metadata={"user": user_id})
 async def gpt_call(message_history: list = []):
     client = OpenAI()
 
@@ -69,11 +63,9 @@ async def gpt_call(message_history: list = []):
         model=model,
         messages=message_history,
         stream=True,
-        user=user_id,
     )
     return stream
 
-@traceable(run_type="llm", name="gpt 4 turbo vision call", metadata={"user": user_id})
 def gpt_vision_call(image_history: list = []):
     client = OpenAI()
   
@@ -82,7 +74,6 @@ def gpt_vision_call(image_history: list = []):
         messages=image_history,
         max_tokens=300,
         stream=True,
-        user=user_id,
     )
 
     return stream
@@ -97,7 +88,6 @@ def start_chat():
  
 
 @cl.on_message
-@traceable(run_type="chain", name="message", metadata={"user": user_id})
 async def on_message(msg: cl.Message):
     message_history = cl.user_session.get("message_history")
     image_history = cl.user_session.get("image_history")
