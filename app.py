@@ -13,7 +13,7 @@ def process_images(msg: cl.Message):
 
     # Accessing the bytes of a specific image
     image_bytes = images[0].content # take the first image just for demo purposes
-    print(len(image_bytes))
+
     # check the size of the image, max 1mb
     if len(image_bytes) > 1000000:
         return "too_large"
@@ -51,8 +51,7 @@ def handle_vision_call(msg, image_history):
             }
         )
         stream = gpt_vision_call(image_history)
-        # clear the image history
-        image_history.clear()
+
         return stream
 
 async def gpt_call(message_history: list = []):
@@ -98,7 +97,6 @@ async def on_message(msg: cl.Message):
         stream = handle_vision_call(msg, image_history)
         if stream == "too_large":
             return await cl.Message(content="Image too large, max 1mb").send()
-
 
     else:
         # add the message in both to keep the coherence between the two histories
