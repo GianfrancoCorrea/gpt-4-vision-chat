@@ -6,7 +6,6 @@ import os
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 model = "gpt-3.5-turbo-1106"
 model_vision = "gpt-4-vision-preview"
-# generate UUID for the user from python
    
 def process_images(msg: cl.Message):
     # Processing images exclusively
