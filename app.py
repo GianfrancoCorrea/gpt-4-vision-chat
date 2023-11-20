@@ -4,6 +4,7 @@ import base64
 import os
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+os.environ["BASE_API_URL"] = os.getenv("BASE_API_URL", "https://api.openai.com/v1")
 model = "gpt-3.5-turbo-1106"
 model_vision = "gpt-4-vision-preview"
    
@@ -55,7 +56,7 @@ def handle_vision_call(msg, image_history):
         return stream
 
 async def gpt_call(message_history: list = []):
-    client = OpenAI()
+    client = OpenAI(base_url=os.environ["BASE_API_URL"])
 
     stream = client.chat.completions.create(
         model=model,
@@ -65,12 +66,12 @@ async def gpt_call(message_history: list = []):
     return stream
 
 def gpt_vision_call(image_history: list = []):
-    client = OpenAI()
+    client = OpenAI(base_url=os.environ["BASE_API_URL"])
   
     stream = client.chat.completions.create(
         model=model_vision,
         messages=image_history,
-        max_tokens=300,
+        max_tokens=350,
         stream=True,
     )
 
