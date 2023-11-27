@@ -3,9 +3,11 @@ from openai import OpenAI
 import base64
 import os
 
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+
+if os.getenv("OPENAI_API_KEY") is not None:
+    os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["BASE_API_URL"] = os.getenv("BASE_API_URL", "https://api.openai.com/v1")
-model = "gpt-3.5-turbo-1106"
+model = "gpt-4-1106-preview"
 model_vision = "gpt-4-vision-preview"
    
 def process_images(msg: cl.Message):
@@ -77,14 +79,38 @@ def gpt_vision_call(image_history: list = []):
 
     return stream
 
+async def wait_for_key():
+    res = await cl.AskUserMessage(content="Send an openai api-key to start", timeout=600).send()
+    if res:
+        await cl.Message(content="setting up...", indent=1).send()
+        os.environ["OPENAI_API_KEY"] = res["content"]
+        # check if the key is valid
+        client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        try:
+            stream = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "system", "content": "test"}],
+                max_tokens=1,
+                stream=True,
+            )
+            if stream:
+                await cl.Message(content="api-key setted, you can start chatting!", indent=1).send()
+        except Exception as e:
+            await cl.Message(content=f"{e}", indent=1).send()
+            return await wait_for_key()
+        return await cl.Message(content="api-key setted, you can start chatting!").send()
+    else:
+        return await wait_for_key()
+
 @cl.on_chat_start
-def start_chat():
+async def start_chat():
     cl.user_session.set(
         "message_history",
         [{"role": "system", "content": "You are a helpful assistant. You are made by GPT-3.5-turbo-1106, the latest version developed by Openai. You do not have the ability to receive images, but if the user uploads an image with the message, GPT-4-vision-preview will be used. So if a user asks you if you have the ability to analyze images, you can tell them that. And tell him that at the bottom left (above the text input) he has a button to upload images, or he can drag it to the chat, or he can just copy paste the input"}],
     )
     cl.user_session.set("image_history", [{"role": "system", "content": "You are a helpful assistant. You are developed with GPT-4-vision-preview, if the user uploads an image, you have the ability to understand it. For normal messages GPT-3.5-turbo-1106 will be used, and for images you will use it. If the user asks about your capabilities you can tell them that."}])
- 
+    if os.getenv("OPENAI_API_KEY") is None:
+        await wait_for_key()
 
 @cl.on_message
 async def on_message(msg: cl.Message):
